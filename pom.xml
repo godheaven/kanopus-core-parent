@@ -1,0 +1,184 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cl.kanopus</groupId>
+	<artifactId>kanopus-core-parent</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<name>Kanopus Core Parent</name>
+	<description>Parent for Kanopus core libraries (no Spring Boot)</description>
+	<url>https://kanopus.cl/</url>
+
+	<properties>
+		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<lombok.version>1.18.34</lombok.version>
+		<junit.jupiter.version>5.11.4</junit.jupiter.version>
+		<mockito.core.version>5.19.0</mockito.core.version>
+
+		<maven.test.skip>false</maven.test.skip>
+		<license.skip>true</license.skip>
+	</properties>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>
+				A permissive license that allows commercial use and modification,
+				provided that proper attribution and copyright notice are retained.
+			</comments>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>pablo</id>
+			<name>Pablo Andres Diaz Saavedra</name>
+			<email>pabloandres.diazsaavedra@gmail.com</email>
+			<url>https://github.com/godheaven</url>
+			<organization>Kanopus</organization>
+			<organizationUrl>https://kanopus.cl</organizationUrl>
+			<roles>
+				<role>Developer</role>
+				<role>Architect</role>
+			</roles>
+			<timezone>-3</timezone>
+		</developer>
+	</developers>
+
+	<!-- Requerido por Central: referencia pública al repo -->
+	<scm>
+		<connection>scm:git:https://github.com/godheaven/kanopus-core-parent.git</connection>
+		<developerConnection>scm:git:https://github.com/godheaven/kanopus-core-parent.git</developerConnection>
+		<url>https://github.com/godheaven/kanopus-core-parent</url>
+		<tag>HEAD</tag>
+	</scm>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.core.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- Sign ALL artifacts, including the .pom -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.13.0</version>
+					<configuration>
+						<release>${java.version}</release>
+						<excludes>
+							<exclude>**/package-info.java</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.5.3</version>
+					<configuration>
+						<skipTests>${maven.test.skip}</skipTests>
+					</configuration>
+				</plugin>
+
+				<!-- Se declara aquí para que los hijos lo hereden, pero el header se controla con 'license.skip' -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>2.6.0</version>
+					<configuration>
+						<skipUpdateLicense>${license.skip}</skipUpdateLicense>
+						<includes>
+							<include>**/*.java</include>
+						</includes>
+						<licenseName>apache_v2</licenseName>
+						<organizationName>Pablo Díaz Saavedra</organizationName>
+						<inceptionYear>2025</inceptionYear>
+						<addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+						<processStartTag>!--</processStartTag>
+						<processEndTag>--!</processEndTag>
+						<descriptionTemplate>${project.parent.basedir}/src/license/description.ftl</descriptionTemplate>
+					</configuration>
+					<executions>
+						<execution>
+							<id>apply-license-headers</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>update-file-header</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.8.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
