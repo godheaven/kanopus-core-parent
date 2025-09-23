@@ -1,11 +1,11 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 
+	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>3.5.6</version>
+	<version>3.5.6.1</version>
 	<packaging>pom</packaging>
 
 	<name>Kanopus Core Parent</name>
@@ -24,6 +24,8 @@
 		<license-maven-plugin.version>2.6.0</license-maven-plugin.version>
 		<maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
 		<maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
 		<proguard-maven-plugin.version>2.6.1</proguard-maven-plugin.version>
 
 		<!-- behavior configuration -->
@@ -76,14 +78,12 @@
 		</developer>
 	</developers>
 
-	<!-- Requerido por Central: referencia pública al repo -->
 	<scm>
 		<connection>scm:git:https://github.com/godheaven/kanopus-core-parent.git</connection>
 		<developerConnection>scm:git:https://github.com/godheaven/kanopus-core-parent.git</developerConnection>
 		<url>https://github.com/godheaven/kanopus-core-parent</url>
 		<tag>HEAD</tag>
 	</scm>
-
 
 	<dependencies>
 		<dependency>
@@ -110,12 +110,21 @@
 		</dependency>
 	</dependencies>
 
-
 	<profiles>
 		<profile>
 			<id>release</id>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+					</plugin>
+
 					<!-- Sign ALL artifacts, including the .pom -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -150,6 +159,40 @@
 						</excludes>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<failOnError>false</failOnError>
+						<doclint>none</doclint> <!-- evita doclint con Java 8+ -->
+						<source>${java.version}</source>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -186,7 +229,6 @@
 						</execution>
 					</executions>
 				</plugin>
-
 
 				<plugin>
 					<groupId>com.github.wvengen</groupId>
