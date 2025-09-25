@@ -22,7 +22,7 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
   <groupId>cl.kanopus</groupId>
   <artifactId>kanopus-core-parent</artifactId>
-  <version>1.0.0</version>
+  <version>3.5.6.2</version>
 </parent>
 
 ```
