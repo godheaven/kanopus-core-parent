@@ -9,10 +9,13 @@
 It is primarily intended for libraries and modules that **do not rely on Spring Boot** as part of their dependencies.
 
 This parent artifact provides:
-- Centralized management of core library versions (Lombok, JUnit, Mockito, etc.).
-- Standardized compiler and testing plugin configuration.
-- Consistency across Kanopus projects.
-- Reduced duplication of configuration across multiple repositories.
+- Centralized dependency management for core libraries (Lombok, JUnit, Mockito, etc.), ensuring consistent versions across modules.
+- Opinionated compiler and plugin defaults to produce reproducible builds and predictable test behavior.
+- Preconfigured Maven plugins commonly used in CI/CD (maven-compiler, surefire, failsafe, jacoco), reducing per-project setup.
+- Standardized testing and reporting conventions to simplify QA and diagnostics.
+- Shared properties and profiles for multi-module projects and cross-version Java compatibility.
+- A lightweight, framework-agnostic foundation that avoids runtime opinionation (e.g., no Spring Boot assumptions).
+- Faster onboarding and reduced configuration duplication for new modules and libraries.
 
 ## 🚀 Usage
 
@@ -22,7 +25,7 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
   <groupId>cl.kanopus</groupId>
   <artifactId>kanopus-core-parent</artifactId>
-  <version>3.58.0</version>
+  <version>3.59.0</version>
 </parent>
 
 ```
