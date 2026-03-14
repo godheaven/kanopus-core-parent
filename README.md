@@ -25,10 +25,40 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
   <groupId>cl.kanopus</groupId>
   <artifactId>kanopus-core-parent</artifactId>
-  <version>3.59.0</version>
+  <version>4.03.0</version>
 </parent>
 
 ```
+
+## ⚙️ Custom Configurations
+
+Properties defined in this parent that can be overridden by child projects:
+
+- `<java.version>`: Default is `25`.
+- `<maven.test.skip>`: Default is `false`.
+- `<jacoco.minimum.coverage>`: Default is `0.80` (80% minimum test coverage).
+- `<license.skip>`: Default is `true` (skips applying generic Apache 2.0 license headers).
+- `<proguard.skip>`: Default is `true` (skips Proguard obfuscation).
+
+## 🔌 Plugin Execution Phases
+
+This POM configures several plugins bound to specific Maven lifecycle phases to ensure quality and security automatically:
+
+- **`validate` phase**:
+  - `license-maven-plugin`: Applies license headers to source files (runs if `license.skip` is `false`).
+- **`package` phase**:
+  - `proguard-maven-plugin`: Processes and obfuscates the code (runs if `proguard.skip` is `false`).
+- **`verify` phase**:
+  - `jacoco-maven-plugin`: Enforces the minimum test coverage rule configured in `<jacoco.minimum.coverage>`.
+  - `snyk-maven-plugin`: Scans the project for known vulnerabilities (`snyk:test`).
+  - `sonar-maven-plugin`: Executes SonarQube analysis for code quality (`sonar:sonar`).
+  - `maven-failsafe-plugin`: Runs integration tests (`*IT.java`).
+  - `maven-gpg-plugin`: Signs artifacts (only active when using the `release` profile).
+
+Additionally:
+- **Spotless Maven Plugin** is available and pre-configured to format code using Google Java Format in AOSP mode (4 spaces indentation).
+- **Maven Enforcer Plugin** guarantees that the build environment uses Maven `3.6.3` or higher.
+
 
 ## Authors
 

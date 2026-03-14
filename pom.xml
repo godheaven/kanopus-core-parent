@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>3.59.0</version>
+	<version>4.03.0</version>
 	<packaging>pom</packaging>
 
 	<name>Kanopus Core Parent</name>
@@ -13,37 +13,40 @@
 	<url>https://kanopus.cl/</url>
 
 	<properties>
-		<java.version>17</java.version>
+		<java.version>25</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- BOM springboot versions -->
-		<spring.boot.version>3.5.9</spring.boot.version>
-		<!-- SNYK Fixes -->
-		<commons-lang3.version>3.20.0</commons-lang3.version> <!-- CVE-2025-48924 -->
+		<spring.boot.version>4.0.3</spring.boot.version>
 
 		<!-- BOM kanopus versions -->
-		<klib-common.version>3.59.0</klib-common.version>
-		<klib-data-jdbc.version>3.59.0</klib-data-jdbc.version>
-		<klib-deploy-sql.version>3.59.0</klib-deploy-sql.version>
-		<klib-excel.version>3.59.0</klib-excel.version>
-		<klib-pdf.version>3.59.0</klib-pdf.version>
-		<klib-rest-template.version>3.59.0</klib-rest-template.version>
-		<klib-sii.version>3.59.0</klib-sii.version>
-		<klib-sii-iva.version>3.59.0</klib-sii-iva.version>
+		<klib-common.version>4.03.0</klib-common.version>
+		<klib-data-jdbc.version>4.03.0</klib-data-jdbc.version>
+		<klib-deploy-sql.version>4.03.0</klib-deploy-sql.version>
+		<klib-excel.version>4.03.0</klib-excel.version>
+		<klib-pdf.version>4.03.0</klib-pdf.version>
+		<klib-rest-template.version>4.03.0</klib-rest-template.version>
+		<klib-sii.version>4.03.0</klib-sii.version>
+		<klib-sii-iva.version>4.03.0</klib-sii-iva.version>
 
 		<!-- plugins versions -->
 		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
 		<license-maven-plugin.version>2.7.1</license-maven-plugin.version>
 		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
-		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
-		<maven-surfire-plugin.version>3.5.4</maven-surfire-plugin.version>
+		<maven-surfire-plugin.version>3.5.5</maven-surfire-plugin.version>
 		<proguard-maven-plugin.version>2.7.0</proguard-maven-plugin.version>
 		<versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
 		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
-		<maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
+		<maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
 		<jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+
+		<!-- new plugins versions -->
+		<spotless-maven-plugin.version>2.44.3</spotless-maven-plugin.version>
+		<snyk-maven-plugin.version>2.2.0</snyk-maven-plugin.version>
+		<sonar-maven-plugin.version>4.0.1.6619</sonar-maven-plugin.version>
 
 		<!-- behavior configuration -->
 		<maven.test.skip>false</maven.test.skip>
@@ -66,12 +69,6 @@
 				<version>${spring.boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>${commons-lang3.version}</version>
 			</dependency>
 
 			<dependency>
@@ -510,6 +507,55 @@
 							</rules>
 							<fail>true</fail>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- SPOTLESS FORMATTER PLUGIN -->
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>${spotless-maven-plugin.version}</version>
+				<configuration>
+					<java>
+						<googleJavaFormat>
+							<style>AOSP</style> <!-- AOSP mode sets indent to 4 spaces securely under Google format -->
+							<reflowLongStrings>true</reflowLongStrings>
+						</googleJavaFormat>
+						<!-- Note: Google Java Format strictly enforces its own limit of 100 or 80 characters for lines. -->
+						<!-- Spotless does not allow altering this specifically to a custom 600 character value in GJF mode. -->
+					</java>
+				</configuration>
+			</plugin>
+
+			<!-- SNYK VALIDATION PLUGIN -->
+			<plugin>
+				<groupId>io.snyk</groupId>
+				<artifactId>snyk-maven-plugin</artifactId>
+				<version>${snyk-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>snyk-test</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- SONAR VALIDATION PLUGIN -->
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>${sonar-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>sonar-test</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sonar</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
