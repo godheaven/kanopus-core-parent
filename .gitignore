@@ -1,0 +1,46 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+
+# Keystores and secrets
+*.p12
+*.jks
+*.keystore
+application-local.properties
+application.properties.local
+
+# Temporary files
+*.tmp
+*~
+
+# Optional: generated files
+/generated-sources/
+/generated-test-sources/
+
+# Eclipse
+bin/
+
+# Others
+.vscode/
+
