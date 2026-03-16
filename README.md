@@ -1,13 +1,15 @@
-![Logo](https://www.kanopus.cl/assets/kanopus-grey.png)
+<p align="left">
+  <img src="https://www.kanopus.cl/assets/kanopus_black.png" width="220"/>
+</p>
 
-[![Maven Central](https://img.shields.io/maven-central/v/cl.kanopus/kanopus-core-parent.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/cl.kanopus/kanopus-core-parent)
+![Maven](https://img.shields.io/maven-central/v/cl.kanopus/kanopus-core-parent) ![License](https://img.shields.io/badge/license-Apache%20License,%20Version%202.0-blue) ![Java](https://img.shields.io/badge/java-17+-orange)
 
-## 📌 Overview
+# kanopus-core-parent
 
 **Kanopus Core Parent** is the **main parent POM** that aggregates common configurations and centralizes library versions used across the **Kanopus ecosystem**.
 It provides a lightweight foundation for core libraries that do not require Spring Boot at runtime, while still importing the Spring Boot BOM for dependency alignment.
 
-## ✨ This parent artifact provides:
+## ✨ Features
 
 - **Centralized dependency management**
   Imports the Spring Boot BOM for consistent version alignment and manages Kanopus libraries such as `klib-common`, `klib-data-jdbc`, `klib-deploy-sql`, `klib-excel`, `klib-pdf`, `klib-rest-template`, and `klib-sii-iva`.
@@ -36,33 +38,46 @@ It provides a lightweight foundation for core libraries that do not require Spri
 - **Project governance defaults**
   Enforces a minimum Maven version and includes the Versions Maven Plugin for dependency maintenance.
 
+
+## 🚀 Installation
+
+To use this parent in your Maven project, add the following to your `pom.xml`:
+
+```xml
+
+<parent>
+	<groupId>cl.kanopus</groupId>
+	<artifactId>kanopus-core-parent</artifactId>
+	<version>4.03.0</version>
+</parent>
+
+```
+
 ## ⚙️ Configurable properties
 
-You can adjust the build behavior using the following Maven properties (default values shown):
+You can tune the parent POM's behavior with simple Maven properties. The table below summarizes the most
+important properties, their defaults, and quick guidance.
 
-- `java.version` (default: `17`)
-    - Java version used for compilation.
+| Property | Default | Description | Example |
+|---|---:|---|---|
+| `maven.test.skip` | `false` | If `true`, tests are skipped. Keep `false` to produce JaCoCo coverage data. | `-Dmaven.test.skip=false` |
+| `license.skip` | `true` | Skip license-header verification when `true`. | `-Dlicense.skip=true` |
+| `proguard.skip` | `true` | Skip ProGuard packaging/obfuscation when `true`. | `-Dproguard.skip=true` |
+| `jacoco.minimum.coverage` | `0.80` | Overall minimum coverage threshold (unit + integration). Build fails if coverage is below this value. | `-Djacoco.minimum.coverage=0.85` |
+| `spotless.check.skip` | `false` | Skip Spotless checks when `true`. Useful for quick local builds. | `-Dspotless.check.skip=true` |
+| `snyk.skip` | `true` | Skip Snyk vulnerability checks when `true`. | `-Dsnyk.skip=true` |
+| `sonar.skip` | `true` | Skip Sonar analysis during `verify` when `true`. | `-Dsonar.skip=true` |
 
-- `maven.test.skip` (default: `false`)
-    - If set to `true`, Maven will skip executing tests. Keep it `false` to run tests and produce coverage data for JaCoCo.
+Important notes
+- To allow JaCoCo to collect execution data you must run tests (so keep `maven.test.skip=false`). If you see
+  "Skipping JaCoCo execution due to missing execution data file" it means the JaCoCo report data file (e.g.
+  `target/jacoco.exec`) was not produced — usually because tests did not run or ran in a different lifecycle that
+  didn't produce the expected output path.
+- Coverage threshold applies to the combined metric (unit + integration tests) and is configurable via
+  `jacoco.minimum.coverage`.
 
-- `license.skip` (default: `true`)
-    - Controls whether license checks are skipped during the build.
+## 🚀 Usage Guide
 
-- `proguard.skip` (default: `true`)
-    - Controls whether ProGuard (obfuscation/optimization) is skipped.
-
-- `jacoco.minimum.coverage` (default: `0.80`)
-    - Minimum overall coverage threshold (e.g. `0.80` = 80%). The JaCoCo check will fail the build if total coverage is below this value.
-
-
-- `snyk.skip` (default: `true`)
-    - Controls whether the Snyk vulnerability check should be skipped.
-
-- `sonar.skip` (default: `true`)
-    - Controls whether the Sonar validation plugin should be skipped during the verification phase.
-
-### Examples
 
 - Run the full verification including JaCoCo check (default threshold):
 
@@ -112,36 +127,23 @@ $env:SONAR_HOST_URL="https://your-sonar-instance.com"
 mvn verify -Dsnyk.skip=false -Dsonar.skip=false -Dsonar.host.url=$SONAR_HOST_URL
 ```
 
-## 🚀 Usage
-
-To use this parent in your Maven project, add the following to your `pom.xml`:
-
-```xml
-
-<parent>
-	<groupId>cl.kanopus</groupId>
-	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.03.0</version>
-</parent>
-
-```
-
 ## 📚 When to use
 
 Use **Kanopus Core Parent** for modules and libraries that **do not rely on Spring Boot** as part of their dependencies.
 For projects with Spring Boot, use `kanopus-boot-parent`.
 
-## Authors
+## 👤 Author
 
-- [@pabloandres.diazsaavedra](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/)
+**Pablo Andrés Díaz Saavedra** — Founder of **Kanopus – Estrellas del Software**
 
-## License
+Kanopus builds tools and platforms that simplify software development and DevOps processes.
 
-This software is licensed under the Apache License, Version 2.0. See the LICENSE file for details.
-I hope you enjoy it.
+[GitHub](https://github.com/godheaven) | [LinkedIn](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/) | [Website](https://kanopus.cl)
 
-[![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://opensource.org/license/apache-2-0)
+## 📄 License
 
-## Support
+Licensed under the Apache License, Version 2.0. See `LICENSE` for details.
 
-For support, email soporte@kanopus.cl
+## 🛟 Support
+
+For support or questions contact: 📧 [soporte@kanopus.cl](mailto:soporte@kanopus.cl)
