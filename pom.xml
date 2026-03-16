@@ -62,7 +62,7 @@
 		<sonar.skip>true</sonar.skip>
 
 		<!-- argLine for surefire and failsafe.-->
-		<argLine></argLine>
+		<argLine/>
 
 	</properties>
 
