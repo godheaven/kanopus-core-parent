@@ -1,5 +1,5 @@
-<p align="left">
-  <img src="https://www.kanopus.cl/assets/kanopus_black.png" width="220"/>
+<p style="text-align:left">
+  <img src="https://www.kanopus.cl/assets/kanopus_black.png" width="220" alt="Kanopus logo"/>
 </p>
 
 ![Maven](https://img.shields.io/maven-central/v/cl.kanopus/kanopus-core-parent) ![License](https://img.shields.io/badge/license-Apache%20License,%20Version%202.0-blue) ![Java](https://img.shields.io/badge/java-17+-orange)
@@ -48,7 +48,7 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.03.0</version>
+	<version>4.03.1</version>
 </parent>
 
 ```
