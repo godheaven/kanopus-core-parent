@@ -14,9 +14,6 @@ It provides a lightweight foundation for core libraries that do not require Spri
 - **Centralized dependency management**
   Imports the Spring Boot BOM for consistent version alignment and manages Kanopus libraries such as `klib-common`, `klib-data-jdbc`, `klib-deploy-sql`, `klib-excel`, `klib-pdf`, `klib-rest-template`, and `klib-sii-iva`.
 
-- **Secure Jackson 3 baseline**
-  Explicitly manages `jackson-core`, `jackson-databind`, and `jackson-annotations` with Jackson 3 coordinates (`tools.jackson.core`) to reduce inherited vulnerabilities reported by Snyk.
-
 - **Shared base dependencies**
   Provides common dependencies out of the box, including `slf4j-api`, `lombok` (provided), `junit-jupiter`, `mockito-core`, and `logback-classic` for tests.
 
@@ -48,7 +45,7 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.03.1</version>
+	<version>4.04.0</version>
 </parent>
 
 ```

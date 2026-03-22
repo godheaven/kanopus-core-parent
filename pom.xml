@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.03.1</version>
+	<version>4.04.0</version>
 	<packaging>pom</packaging>
 
 	<name>Kanopus Core Parent</name>
@@ -14,25 +14,21 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- Explicit Jackson overrides for Snyk vulnerability remediation -->
-		<jackson-annotations.version>2.21</jackson-annotations.version>
-		<jackson-core.version>2.21.1</jackson-core.version>
-		<jackson-databind.version>2.21.1</jackson-databind.version>
-
 		<!-- BOM springboot versions -->
-		<spring.boot.version>4.0.3</spring.boot.version>
+		<spring.boot.version>4.0.4</spring.boot.version>
 
 		<!-- BOM kanopus versions -->
-		<klib-common.version>4.03.1</klib-common.version>
-		<klib-data-jdbc.version>4.03.1</klib-data-jdbc.version>
-		<klib-deploy-sql.version>4.03.1</klib-deploy-sql.version>
-		<klib-excel.version>4.03.1</klib-excel.version>
-		<klib-pdf.version>4.03.1</klib-pdf.version>
-		<klib-rest-template.version>4.03.1</klib-rest-template.version>
-		<klib-sii.version>4.03.1</klib-sii.version>
-		<klib-sii-iva.version>4.03.1</klib-sii-iva.version>
+		<klib-common.version>4.04.0</klib-common.version>
+		<klib-data-jdbc.version>4.04.0</klib-data-jdbc.version>
+		<klib-deploy-sql.version>4.04.0</klib-deploy-sql.version>
+		<klib-excel.version>4.04.0</klib-excel.version>
+		<klib-pdf.version>4.04.0</klib-pdf.version>
+		<klib-rest-template.version>4.04.0</klib-rest-template.version>
+		<klib-sii.version>4.04.0</klib-sii.version>
+		<klib-sii-iva.version>4.04.0</klib-sii-iva.version>
 
 		<!-- plugins versions -->
 		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
@@ -47,8 +43,6 @@
 		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>3.5.5</maven-failsafe-plugin.version>
 		<jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
-
-		<!-- new plugins versions -->
 		<spotless-maven-plugin.version>2.44.3</spotless-maven-plugin.version>
 		<snyk-maven-plugin.version>2.2.0</snyk-maven-plugin.version>
 		<sonar-maven-plugin.version>4.0.1.6619</sonar-maven-plugin.version>
@@ -69,22 +63,6 @@
 	<!-- BOM integrado -->
 	<dependencyManagement>
 		<dependencies>
-			<!-- Explicitly manage patched Jackson artifacts to avoid inheriting Snyk-reported vulnerabilities. -->
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson-annotations.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
-				<version>${jackson-core.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${jackson-databind.version}</version>
-			</dependency>
 
 			<!-- Importer BOM of Spring Boot -->
 			<dependency>
@@ -93,12 +71,6 @@
 				<version>${spring.boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>com.fasterxml.jackson</groupId>
-						<artifactId>jackson-bom</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 
 			<dependency>
@@ -222,6 +194,18 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
