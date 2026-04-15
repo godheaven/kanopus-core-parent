@@ -45,7 +45,7 @@ To use this parent in your Maven project, add the following to your `pom.xml`:
 <parent>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.04.0</version>
+	<version>4.05.0</version>
 </parent>
 
 ```
