@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.05.0</version>
+	<version>4.05.1</version>
 	<packaging>pom</packaging>
 
 	<name>Kanopus Core Parent</name>
@@ -17,18 +17,21 @@
 		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- BOM springboot versions -->
+		<!--  BOM versions -->
 		<spring.boot.version>4.0.5</spring.boot.version>
+		<jackson-core.version>3.1.1</jackson-core.version>
+
 
 		<!-- BOM kanopus versions -->
-		<klib-common.version>4.05.0</klib-common.version>
-		<klib-data-jdbc.version>4.05.0</klib-data-jdbc.version>
-		<klib-deploy-sql.version>4.05.0</klib-deploy-sql.version>
-		<klib-excel.version>4.05.0</klib-excel.version>
-		<klib-pdf.version>4.05.0</klib-pdf.version>
-		<klib-rest-template.version>4.05.0</klib-rest-template.version>
-		<klib-sii.version>4.05.0</klib-sii.version>
-		<klib-sii-iva.version>4.05.0</klib-sii-iva.version>
+		<klib-common.version>4.05.1</klib-common.version>
+		<klib-data-jdbc.version>4.05.1</klib-data-jdbc.version>
+		<klib-deploy-sql.version>4.05.1</klib-deploy-sql.version>
+		<klib-excel.version>4.05.1</klib-excel.version>
+		<klib-pdf.version>4.05.1</klib-pdf.version>
+		<klib-rest-template.version>4.05.1</klib-rest-template.version>
+		<klib-license-validator.version>4.05.1</klib-license-validator.version>
+		<klib-sii.version>4.05.1</klib-sii.version>
+		<klib-sii-iva.version>4.05.1</klib-sii-iva.version>
 
 		<!-- plugins versions -->
 		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
@@ -51,16 +54,16 @@
 		<maven.test.skip>false</maven.test.skip>
 		<license.skip>true</license.skip>
 		<proguard.skip>true</proguard.skip>
-		<jacoco.minimum.coverage>0.80</jacoco.minimum.coverage>
 		<snyk.skip>true</snyk.skip>
 		<sonar.skip>true</sonar.skip>
+		<jacoco.minimum.coverage>0.80</jacoco.minimum.coverage>
 
 		<!-- argLine for surefire and failsafe.-->
 		<argLine/>
 
 	</properties>
 
-	<!-- BOM integrado -->
+	<!-- BOM integrate -->
 	<dependencyManagement>
 		<dependencies>
 
@@ -124,11 +127,28 @@
 			</dependency>
 
 			<dependency>
+				<groupId>cl.kanopus.lib</groupId>
+				<artifactId>klib-license-validator</artifactId>
+				<version>${klib-license-validator.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>cl.kanopus.util</groupId>
 				<artifactId>klib-sii-iva</artifactId>
 				<version>${klib-sii-iva.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>cl.kanopus.util</groupId>
+				<artifactId>klib-sii</artifactId>
+				<version>${klib-sii.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>tools.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson-core.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -192,12 +212,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<scope>test</scope>
@@ -208,6 +222,7 @@
 			<artifactId>hamcrest</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<profiles>
@@ -248,6 +263,7 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -368,10 +384,10 @@
 									<exclude>**/*Response*.class</exclude>
 									<exclude>**/*VO*.class</exclude>
 									<exclude>**/*Entity*.class</exclude>
+									<exclude>**/*Exception*.class</exclude>
 									<exclude>**/package-info.class</exclude>
 								</excludes>
 							</configuration>
-
 						</execution>
 						<execution>
 							<id>check</id>
@@ -399,6 +415,7 @@
 											<exclude>**/*Response*.class</exclude>
 											<exclude>**/*VO*.class</exclude>
 											<exclude>**/*Entity*.class</exclude>
+											<exclude>**/*Exception*.class</exclude>
 											<exclude>**/package-info.class</exclude>
 										</excludes>
 									</rule>
@@ -406,6 +423,16 @@
 							</configuration>
 						</execution>
 					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.sonatype.central</groupId>
+					<artifactId>central-publishing-maven-plugin</artifactId>
+					<version>${central-publishing-maven-plugin.version}</version>
+					<extensions>true</extensions>
+					<configuration>
+						<publishingServerId>central</publishingServerId>
+					</configuration>
 				</plugin>
 
 				<!-- It is declared here for children to inherit, but the header is controlled with 'license.skip' -->
@@ -433,6 +460,28 @@
 							<goals>
 								<goal>update-file-header</goal>
 							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${maven-enforcer-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>enforce-maven-min-version</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<requireMavenVersion>
+										<version>[3.6.3,)</version>
+									</requireMavenVersion>
+								</rules>
+								<fail>true</fail>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
@@ -476,6 +525,10 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 			</plugin>
@@ -484,15 +537,9 @@
 				<artifactId>proguard-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.sonatype.central</groupId>
-				<artifactId>central-publishing-maven-plugin</artifactId>
-				<version>${central-publishing-maven-plugin.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<publishingServerId>central</publishingServerId>
-				</configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
@@ -503,28 +550,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>${maven-enforcer-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>enforce-maven-min-version</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>[3.6.3,)</version>
-								</requireMavenVersion>
-							</rules>
-							<fail>true</fail>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
+		
 			<!-- SPOTLESS FORMATTER PLUGIN -->
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
