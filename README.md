@@ -6,141 +6,78 @@
 
 # kanopus-core-parent
 
-**Kanopus Core Parent** is the **main parent POM** that aggregates common configurations and centralizes library versions used across the **Kanopus ecosystem**.
-It provides a lightweight foundation for core libraries that do not require Spring Boot at runtime, while still importing the Spring Boot BOM for dependency alignment.
+**Kanopus Core Parent** is the base parent POM for Kanopus core libraries that do not require Spring Boot runtime starters.
+It centralizes dependency versions, plugin defaults, quality gates, and release conventions so child modules can stay lightweight and consistent.
 
-## ✨ Features
+## This parent artifact provides:
 
-- **Centralized dependency management**
-  Imports the Spring Boot BOM for consistent version alignment and manages Kanopus libraries such as `klib-common`, `klib-data-jdbc`, `klib-deploy-sql`, `klib-excel`, `klib-pdf`, `klib-rest-template`, and `klib-sii-iva`.
+- **BOM-based version alignment** via `spring-boot-dependencies` (`4.0.6`) to keep third-party libraries consistent.
+- **Managed Kanopus libraries** for `klib-common`, `klib-data-jdbc`, `klib-deploy-sql`, `klib-excel`, `klib-pdf`, `klib-rest-template`, `klib-license-validator`, `klib-sii`, and `klib-sii-iva`.
+- **OpenAPI starter management** for `springdoc-openapi-starter-webmvc-ui`.
+- **Shared baseline dependencies** (`slf4j-api`, `lombok` as `provided`, `junit-jupiter`, `mockito-core`, `spring-test`, and `hamcrest`).
+- **Standardized build plugins** through `pluginManagement` for compiler, test lifecycle, coverage, licensing, publishing, and enforcement.
+- **Quality and security hooks** with Spotless (profile-driven), Snyk, Sonar, JaCoCo, and Maven Enforcer.
+- **Release workflow defaults** including sources, Javadocs, optional GPG signing, and Central publishing support.
 
-- **Shared base dependencies**
-  Provides common dependencies out of the box, including `slf4j-api`, `lombok` (provided), `junit-jupiter`, `mockito-core`, and `logback-classic` for tests.
+## Installation
 
-- **Build and test defaults**
-  Preconfigures Maven Compiler, Surefire, and Failsafe with sensible defaults for Java 17, reproducible test execution, and shared `argLine` propagation.
-
-- **Coverage reporting and quality gates**
-  Integrates JaCoCo to prepare agents, generate reports during `verify`, and enforce a configurable minimum coverage threshold across unit and integration tests.
-
-- **Optional build-time controls**
-  Lets consumers enable or skip license headers and ProGuard packaging through Maven properties, which is useful for faster local iterations or stricter release builds.
-
-- **Formatting, security, and code analysis hooks**
-  Includes Spotless formatting checks, Snyk vulnerability scanning, and Sonar analysis plugins so child projects can adopt consistent CI/CD validation with minimal setup.
-
-- **Release and publishing support**
-  Provides source and Javadoc artifact generation, optional GPG signing in the `release` profile, and Sonatype Central publishing support.
-
-- **Project governance defaults**
-  Enforces a minimum Maven version and includes the Versions Maven Plugin for dependency maintenance.
-
-
-## 🚀 Installation
-
-To use this parent in your Maven project, add the following to your `pom.xml`:
+Add this parent to your project `pom.xml`:
 
 ```xml
-
 <parent>
-	<groupId>cl.kanopus</groupId>
-	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.05.2</version>
+    <groupId>cl.kanopus</groupId>
+    <artifactId>kanopus-core-parent</artifactId>
+    <version>4.06.0</version>
 </parent>
-
 ```
 
-## ⚙️ Configurable properties
+## Key configurable properties
 
-You can tune the parent POM's behavior with simple Maven properties. The table below summarizes the most
-important properties, their defaults, and quick guidance.
+| Property | Default | Description |
+|---|---:|---|
+| `maven.test.skip` | `false` | Skip tests when `true` (not recommended when collecting JaCoCo data). |
+| `license.skip` | `true` | Skip license header updates/checks. |
+| `snyk.skip` | `true` | Skip Snyk validation in `verify`. |
+| `sonar.skip` | `true` | Skip Sonar analysis in `verify`. |
+| `spotless.skip` | `false` | Skip Spotless checks in the `spotless-java` profile. |
+| `jacoco.minimum.coverage` | `0.80` | Minimum JaCoCo instruction coverage ratio enforced at `verify`. |
 
-| Property | Default | Description | Example |
-|---|---:|---|---|
-| `maven.test.skip` | `false` | If `true`, tests are skipped. Keep `false` to produce JaCoCo coverage data. | `-Dmaven.test.skip=false` |
-| `license.skip` | `true` | Skip license-header verification when `true`. | `-Dlicense.skip=true` |
-| `proguard.skip` | `true` | Skip ProGuard packaging/obfuscation when `true`. | `-Dproguard.skip=true` |
-| `jacoco.minimum.coverage` | `0.80` | Overall minimum coverage threshold (unit + integration). Build fails if coverage is below this value. | `-Djacoco.minimum.coverage=0.85` |
-| `spotless.check.skip` | `false` | Skip Spotless checks when `true`. Useful for quick local builds. | `-Dspotless.check.skip=true` |
-| `snyk.skip` | `true` | Skip Snyk vulnerability checks when `true`. | `-Dsnyk.skip=true` |
-| `sonar.skip` | `true` | Skip Sonar analysis during `verify` when `true`. | `-Dsonar.skip=true` |
-
-Important notes
-- To allow JaCoCo to collect execution data you must run tests (so keep `maven.test.skip=false`). If you see
-  "Skipping JaCoCo execution due to missing execution data file" it means the JaCoCo report data file (e.g.
-  `target/jacoco.exec`) was not produced — usually because tests did not run or ran in a different lifecycle that
-  didn't produce the expected output path.
-- Coverage threshold applies to the combined metric (unit + integration tests) and is configurable via
-  `jacoco.minimum.coverage`.
-
-## 🚀 Usage Guide
-
-
-- Run the full verification including JaCoCo check (default threshold):
+## Build and validation commands
 
 ```bash
 mvn -Dmaven.test.skip=false verify
-```
-
-- Run verify with a 90% coverage threshold:
-
-```bash
 mvn -Djacoco.minimum.coverage=0.90 verify
+mvn -Dsnyk.skip=false verify
+mvn -Dsonar.skip=false -Dsonar.host.url="$SONAR_HOST_URL" verify
+mvn -Dspotless.skip=true verify
 ```
 
-- Skip tests for a faster package step:
+## Profiles
 
-```bash
-mvn -Dmaven.test.skip=true package
-```
+- `release`: attaches sources and Javadocs, signs artifacts, and triggers an early `clean` phase for release consistency.
+- `spotless-java`: activates automatically when `src/main/java` exists and runs `spotless:check` during `verify` using `kanopus-style.xml` from `klib-default-config`.
 
-### Running Snyk and SonarQube Validations
+## Notes on plugin inheritance
 
-Both Snyk and SonarQube require credentials to authenticate with their respective servers.
+This parent keeps most plugin versions/configuration inside `pluginManagement`.
+Plugins listed in `build/plugins` are activated for children, while still inheriting the managed configuration centrally.
 
-To run these validations, you need to configure the following environment variables:
+## When to use
 
-- `SNYK_TOKEN`: Your API token generated from your Snyk account.
-- `SONAR_TOKEN`: Your API token generated from your SonarQube server.
-- `SONAR_HOST_URL`: Your SonarQube server instance URL.
+Use `kanopus-core-parent` for reusable libraries/modules that do not depend on Spring Boot runtime starters.
+For Spring Boot application projects, prefer `kanopus-boot-parent`.
 
-Then you can execute Maven and disable the skip flags:
+## Author
 
-**Linux/macOS:**
-
-```bash
-export SNYK_TOKEN="your-snyk-token"
-export SONAR_TOKEN="your-sonar-token"
-export SONAR_HOST_URL="https://your-sonar-instance.com"
-mvn verify -Dsnyk.skip=false -Dsonar.skip=false -Dsonar.host.url=$SONAR_HOST_URL
-```
-
-**Windows (PowerShell):**
-
-```powershell
-$env:SNYK_TOKEN="your-snyk-token"
-$env:SONAR_TOKEN="your-sonar-token"
-$env:SONAR_HOST_URL="https://your-sonar-instance.com"
-mvn verify -Dsnyk.skip=false -Dsonar.skip=false -Dsonar.host.url=$SONAR_HOST_URL
-```
-
-## 📚 When to use
-
-Use **Kanopus Core Parent** for modules and libraries that **do not rely on Spring Boot** as part of their dependencies.
-For projects with Spring Boot, use `kanopus-boot-parent`.
-
-## 👤 Author
-
-⭐**Pablo Andrés Díaz Saavedra** — Founder of **Kanopus – Software Guided by the Stars**⭐
-
-Kanopus is building a constellation of developers creating tools, libraries and platforms that simplify software engineering.
+**Pablo Andres Diaz Saavedra**
+Founder of **Kanopus - Software Guided by the Stars**
 
 [GitHub](https://github.com/godheaven) | [LinkedIn](https://www.linkedin.com/in/pablo-diaz-saavedra-4b7b0522/) | [Website](https://kanopus.cl)
 
-## 📄 License
+## License
 
 Licensed under the Apache License, Version 2.0. See `LICENSE` for details.
 
-## 🛟 Support
+## Support
 
-For support or questions contact: 📧 [soporte@kanopus.cl](mailto:soporte@kanopus.cl)
+For support or questions: [soporte@kanopus.cl](mailto:soporte@kanopus.cl)
