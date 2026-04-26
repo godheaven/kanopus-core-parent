@@ -27,7 +27,7 @@ Add this parent to your project `pom.xml`:
 <parent>
     <groupId>cl.kanopus</groupId>
     <artifactId>kanopus-core-parent</artifactId>
-    <version>4.06.0</version>
+    <version>4.06.3</version>
 </parent>
 ```
 

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cl.kanopus</groupId>
 	<artifactId>kanopus-core-parent</artifactId>
-	<version>4.06.0</version>
+	<version>4.06.3</version>
 	<packaging>pom</packaging>
 
 	<name>Kanopus Core Parent</name>
@@ -21,19 +21,19 @@
 		<proguard-base.version>7.7.0</proguard-base.version>
 		<spring.boot.version>4.0.6</spring.boot.version>
 		<springdoc-openapi-starter-webmvc-ui.version>3.0.3</springdoc-openapi-starter-webmvc-ui.version>
-		<spring-boot-starter-aop.version>3.4.5</spring-boot-starter-aop.version>
+		<spring-boot-starter-aop.version>3.5.14</spring-boot-starter-aop.version>
 
 		<!-- BOM kanopus versions -->
-		<klib-common.version>4.06.0</klib-common.version>
-		<klib-data-jdbc.version>4.06.0</klib-data-jdbc.version>
-		<klib-deploy-sql.version>4.06.0</klib-deploy-sql.version>
-		<klib-excel.version>4.06.0</klib-excel.version>
-		<klib-pdf.version>4.06.0</klib-pdf.version>
-		<klib-rest-template.version>4.06.0</klib-rest-template.version>
-		<klib-license-validator.version>4.06.0</klib-license-validator.version>
-		<klib-sii.version>4.06.0</klib-sii.version>
-		<klib-sii-iva.version>4.06.0</klib-sii-iva.version>
-		<klib-default-config.version>4.06.0</klib-default-config.version>
+		<klib-common.version>4.06.3</klib-common.version>
+		<klib-data-jdbc.version>4.06.3</klib-data-jdbc.version>
+		<klib-deploy-sql.version>4.06.3</klib-deploy-sql.version>
+		<klib-excel.version>4.06.3</klib-excel.version>
+		<klib-pdf.version>4.06.3</klib-pdf.version>
+		<klib-rest-template.version>4.06.3</klib-rest-template.version>
+		<klib-license-validator.version>4.06.3</klib-license-validator.version>
+		<klib-sii.version>4.06.3</klib-sii.version>
+		<klib-sii-iva.version>4.06.3</klib-sii-iva.version>
+		<klib-default-config.version>4.06.3</klib-default-config.version>
 
 		<!-- plugins versions -->
 		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
@@ -57,6 +57,8 @@
 		<spotless-maven-plugin.version>2.44.3</spotless-maven-plugin.version>
 		<snyk-maven-plugin.version>2.2.0</snyk-maven-plugin.version>
 		<sonar-maven-plugin.version>4.0.1.6619</sonar-maven-plugin.version>
+		<spotless.eclipse.version>4.31</spotless.eclipse.version>
+		<spotless.eclipse.p2.mirror>https://download.eclipse.org/eclipse/updates/</spotless.eclipse.p2.mirror>
 
 		<!-- behavior configuration -->
 		<maven.test.skip>false</maven.test.skip>
@@ -70,12 +72,13 @@
 		<!-- argLine for surefire and failsafe.-->
 		<argLine/>
 
+		<resource.delimiter>@</resource.delimiter>
+
 	</properties>
 
 	<!-- BOM integrate -->
 	<dependencyManagement>
 		<dependencies>
-
 
 			<!-- Importer BOM of Spring Boot -->
 			<dependency>
@@ -88,7 +91,7 @@
 
 			<dependency>
 				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
 				<version>${springdoc-openapi-starter-webmvc-ui.version}</version>
 			</dependency>
 
@@ -159,6 +162,7 @@
 				<artifactId>klib-sii</artifactId>
 				<version>${klib-sii.version}</version>
 			</dependency>
+
 
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -308,7 +312,14 @@
 							<skip>${spotless.skip}</skip>
 							<java>
 								<eclipse>
+									<version>${spotless.eclipse.version}</version>
 									<file>kanopus-style.xml</file>
+									<p2Mirrors>
+										<p2Mirror>
+											<prefix>https://download.eclipse.org/eclipse/updates/</prefix>
+											<url>${spotless.eclipse.p2.mirror}</url>
+										</p2Mirror>
+									</p2Mirrors>
 								</eclipse>
 								<indent>
 									<spaces>true</spaces>
@@ -342,6 +353,27 @@
 	</profiles>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/application*.yml</include>
+					<include>**/application*.yaml</include>
+					<include>**/application*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/application*.yml</exclude>
+					<exclude>**/application*.yaml</exclude>
+					<exclude>**/application*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
 		<pluginManagement>
 			<plugins>
 
