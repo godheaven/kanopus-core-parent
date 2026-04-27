@@ -34,6 +34,7 @@
 		<klib-sii.version>4.06.3</klib-sii.version>
 		<klib-sii-iva.version>4.06.3</klib-sii-iva.version>
 		<klib-default-config.version>4.06.3</klib-default-config.version>
+		<klib-avatar-assets.version>4.06.3</klib-avatar-assets.version>
 
 		<!-- plugins versions -->
 		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
@@ -153,6 +154,18 @@
 
 			<dependency>
 				<groupId>cl.kanopus.util</groupId>
+				<artifactId>klib-default-config</artifactId>
+				<version>${klib-default-config.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cl.kanopus.util</groupId>
+				<artifactId>klib-avatar-assets</artifactId>
+				<version>${klib-avatar-assets.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cl.kanopus.util</groupId>
 				<artifactId>klib-sii-iva</artifactId>
 				<version>${klib-sii-iva.version}</version>
 			</dependency>
@@ -162,7 +175,6 @@
 				<artifactId>klib-sii</artifactId>
 				<version>${klib-sii.version}</version>
 			</dependency>
-
 
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
