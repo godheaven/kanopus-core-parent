@@ -67,6 +67,37 @@ Plugins listed in `build/plugins` are activated for children, while still inheri
 Use `kanopus-core-parent` for reusable libraries/modules that do not depend on Spring Boot runtime starters.
 For Spring Boot application projects, prefer `kanopus-boot-parent`.
 
+## CI and release to Maven Central
+
+Every Kanopus repository has two small workflows that call the reusable workflows hosted here:
+
+- `.github/workflows/ci.yml` → [`maven-build.yml`](.github/workflows/maven-build.yml): `mvn verify` on every push to `main` and every pull request.
+- `.github/workflows/release.yml` → [`maven-release.yml`](.github/workflows/maven-release.yml): when a GitHub **release is published**, checks that the tag equals the pom version (`4.20.0` or `v4.20.0`), signs with GPG and deploys with `-P release` to Maven Central (`-Dcentral.autoPublish=true -Dcentral.waitUntil=published`).
+
+Both accept `postgres: true` (starts PostgreSQL 16 with `user_test`/`pass_test`, database `test`) and `db-init-script`.
+
+Local `mvn -P release deploy` keeps the previous behaviour (`central.autoPublish=false`: publish manually in the Central Portal).
+
+### One-time setup
+
+Set the secrets `CENTRAL_USERNAME`, `CENTRAL_TOKEN`, `GPG_PRIVATE_KEY` and `GPG_PASSPHRASE` on every repository:
+
+```bash
+scripts/set-release-secrets.sh            # reads ~/.m2/settings.xml (server "central") and the local GPG key
+```
+
+### Releasing a version for all libraries
+
+Versions follow Spring Boot (`4.2.0` → `4.20.0`). After merging the version bump on `main` of every repository:
+
+```bash
+scripts/release-chain.sh 4.20.0 --dry-run
+scripts/release-chain.sh 4.20.0           # resume after a failure with --from <repo>
+```
+
+The chain creates the releases in dependency order and waits for each artifact on Maven Central:
+`kanopus-core-parent` → `klib-default-config` → `kanopus-boot-parent` → `klib-common` → remaining `klib-*`.
+
 ## Author
 
 **Pablo Andres Diaz Saavedra**

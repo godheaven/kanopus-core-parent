@@ -69,6 +69,10 @@
 		<spotless.skip>false</spotless.skip>
 		<jacoco.minimum.coverage>0.80</jacoco.minimum.coverage>
 
+		<!-- Maven Central publishing: local deploys wait for manual publish; CI release passes -Dcentral.autoPublish=true -->
+		<central.autoPublish>false</central.autoPublish>
+		<central.waitUntil>validated</central.waitUntil>
+
 		<!-- argLine for surefire and failsafe.-->
 		<argLine/>
 
@@ -582,6 +586,8 @@
 					<extensions>true</extensions>
 					<configuration>
 						<publishingServerId>central</publishingServerId>
+						<autoPublish>${central.autoPublish}</autoPublish>
+						<waitUntil>${central.waitUntil}</waitUntil>
 					</configuration>
 				</plugin>
 

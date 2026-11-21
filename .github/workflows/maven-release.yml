@@ -1,0 +1,102 @@
+# Reusable workflow: publish a Kanopus Maven project to Maven Central when a GitHub release is published.
+# Called from each repository's release.yml:
+#   uses: godheaven/kanopus-core-parent/.github/workflows/maven-release.yml@main
+#   secrets: inherit
+#
+# Required repository secrets:
+#   CENTRAL_USERNAME / CENTRAL_TOKEN  -> Sonatype Central Portal user token
+#   GPG_PRIVATE_KEY / GPG_PASSPHRASE  -> armored private key used to sign artifacts
+#
+# The release tag must match the project version in pom.xml (e.g. tag "4.20.0" or "v4.20.0").
+name: maven-release
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: string
+        default: '21'
+      postgres:
+        description: Start a PostgreSQL container (user_test/pass_test, database "test") for tests
+        type: boolean
+        default: false
+      db-init-script:
+        type: string
+        default: ''
+      maven-args:
+        type: string
+        default: ''
+    secrets:
+      CENTRAL_USERNAME:
+        required: true
+      CENTRAL_TOKEN:
+        required: true
+      GPG_PRIVATE_KEY:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maven-release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Check tag matches pom version
+        env:
+          TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          VERSION=$(mvn -B -q -ntp help:evaluate -Dexpression=project.version -DforceStdout)
+          echo "pom version: $VERSION / tag: $TAG"
+          if [ "${TAG#v}" != "$VERSION" ]; then
+            echo "::error::Release tag '$TAG' does not match pom version '$VERSION'"
+            exit 1
+          fi
+
+      - name: Start PostgreSQL
+        if: ${{ inputs.postgres }}
+        env:
+          DB_INIT_SCRIPT: ${{ inputs.db-init-script }}
+        run: |
+          docker run -d --name kanopus-pg -p 5432:5432 \
+            -e POSTGRES_USER=user_test -e POSTGRES_PASSWORD=pass_test -e POSTGRES_DB=test \
+            postgres:16
+          for i in $(seq 1 30); do
+            docker exec kanopus-pg pg_isready -U user_test -d test && break
+            sleep 2
+          done
+          if [ -n "$DB_INIT_SCRIPT" ]; then
+            docker exec -i kanopus-pg psql -v ON_ERROR_STOP=1 -U user_test -d test < "$DB_INIT_SCRIPT"
+          fi
+
+      - name: Deploy to Maven Central
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_ARGS_EXTRA: ${{ inputs.maven-args }}
+        run: >
+          mvn -B -ntp -P release deploy
+          -Dlicense.skip=true
+          -Dcentral.autoPublish=true
+          -Dcentral.waitUntil=published
+          $MAVEN_ARGS_EXTRA

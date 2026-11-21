@@ -1,0 +1,61 @@
+# Reusable workflow: build + test (mvn verify) for Kanopus Maven projects.
+# Called from each repository's ci.yml:
+#   uses: godheaven/kanopus-core-parent/.github/workflows/maven-build.yml@main
+name: maven-build
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        description: JDK version used to build
+        type: string
+        default: '21'
+      postgres:
+        description: Start a PostgreSQL container (user_test/pass_test, database "test") for tests
+        type: boolean
+        default: false
+      db-init-script:
+        description: Optional SQL file (repository-relative) executed on the "test" database before the build
+        type: string
+        default: ''
+      maven-args:
+        description: Extra Maven arguments
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+          cache: maven
+
+      - name: Start PostgreSQL
+        if: ${{ inputs.postgres }}
+        env:
+          DB_INIT_SCRIPT: ${{ inputs.db-init-script }}
+        run: |
+          docker run -d --name kanopus-pg -p 5432:5432 \
+            -e POSTGRES_USER=user_test -e POSTGRES_PASSWORD=pass_test -e POSTGRES_DB=test \
+            postgres:16
+          for i in $(seq 1 30); do
+            docker exec kanopus-pg pg_isready -U user_test -d test && break
+            sleep 2
+          done
+          if [ -n "$DB_INIT_SCRIPT" ]; then
+            docker exec -i kanopus-pg psql -v ON_ERROR_STOP=1 -U user_test -d test < "$DB_INIT_SCRIPT"
+          fi
+
+      - name: Build and test
+        env:
+          MAVEN_ARGS_EXTRA: ${{ inputs.maven-args }}
+        run: mvn -B -ntp verify -Dlicense.skip=true $MAVEN_ARGS_EXTRA
