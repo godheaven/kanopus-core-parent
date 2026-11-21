@@ -19,6 +19,8 @@
 
 		<!--  BOM versions -->
 		<proguard-base.version>7.10.0</proguard-base.version>
+		<!-- proguard-maven-plugin 2.7.0 pins an older proguard-core that breaks proguard-base 7.10 -->
+		<proguard-core.version>9.4.0</proguard-core.version>
 		<spring.boot.version>4.2.0</spring.boot.version>
 		<springdoc-openapi-starter-webmvc-ui.version>3.2.1</springdoc-openapi-starter-webmvc-ui.version>
 
@@ -674,6 +676,12 @@
 							<groupId>com.guardsquare</groupId>
 							<artifactId>proguard-base</artifactId>
 							<version>${proguard-base.version}</version>
+							<scope>runtime</scope>
+						</dependency>
+						<dependency>
+							<groupId>com.guardsquare</groupId>
+							<artifactId>proguard-core</artifactId>
+							<version>${proguard-core.version}</version>
 							<scope>runtime</scope>
 						</dependency>
 					</dependencies>
