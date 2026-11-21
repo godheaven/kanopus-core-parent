@@ -22,6 +22,14 @@ on:
         description: Extra Maven arguments
         type: string
         default: ''
+      bootstrap:
+        description: >-
+          Install the upstream Kanopus build chain (kanopus-core-parent, klib-default-config,
+          kanopus-boot-parent, klib-common) from their main branch before building, so CI works
+          before those versions are published to Maven Central. Only repositories that come
+          before the current one in the chain are installed.
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -38,6 +46,22 @@ jobs:
           distribution: temurin
           java-version: ${{ inputs.java-version }}
           cache: maven
+
+      - name: Bootstrap upstream Kanopus artifacts
+        if: ${{ inputs.bootstrap }}
+        env:
+          CURRENT: ${{ github.event.repository.name }}
+        run: |
+          CHAIN="kanopus-core-parent klib-default-config kanopus-boot-parent klib-common"
+          case " $CHAIN " in *" $CURRENT "*) ;; *) CHAIN="$CHAIN $CURRENT" ;; esac
+          mkdir -p "$RUNNER_TEMP/bootstrap"
+          for repo in $CHAIN; do
+            [ "$repo" = "$CURRENT" ] && break
+            echo "::group::install $repo (main)"
+            git clone --depth 1 "https://github.com/godheaven/$repo.git" "$RUNNER_TEMP/bootstrap/$repo"
+            (cd "$RUNNER_TEMP/bootstrap/$repo" && mvn -B -ntp install -DskipTests -Djacoco.skip=true -Dlicense.skip=true -Dspotless.skip=true)
+            echo "::endgroup::"
+          done
 
       - name: Start PostgreSQL
         if: ${{ inputs.postgres }}
