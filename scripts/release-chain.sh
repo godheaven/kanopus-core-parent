@@ -61,8 +61,10 @@ print(v.text.strip() if v is not None else '')")
     echo "already on Maven Central, skipping"; continue
   fi
 
+  since=$(date -u +%Y-%m-%dT%H:%M:%SZ)
   if gh release view "$VERSION" --repo "$OWNER/$repo" >/dev/null 2>&1; then
     echo "release $VERSION already exists"
+    since=$(gh release view "$VERSION" --repo "$OWNER/$repo" --json createdAt -q .createdAt)
   else
     run gh release create "$VERSION" --repo "$OWNER/$repo" --target main --title "$VERSION" --generate-notes
   fi
@@ -71,8 +73,10 @@ print(v.text.strip() if v is not None else '')")
   echo "waiting for release workflow..."
   run_id=""
   for _ in $(seq 1 30); do
-    run_id=$(gh run list --repo "$OWNER/$repo" --workflow release.yml --event release --limit 1 \
-      --json databaseId,headBranch -q ".[] | select(.headBranch==\"$VERSION\") | .databaseId")
+    # only runs created for this release (an older failed run may exist for the same tag)
+    run_id=$(gh run list --repo "$OWNER/$repo" --workflow release.yml --event release --limit 10 \
+      --json databaseId,headBranch,createdAt \
+      -q "[.[] | select(.headBranch==\"$VERSION\" and .createdAt >= \"$since\")] | sort_by(.createdAt) | last | .databaseId // empty")
     [ -n "$run_id" ] && break
     sleep 10
   done
